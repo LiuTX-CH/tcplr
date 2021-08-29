@@ -1,0 +1,267 @@
+---
+title: "class8"
+output: learnr::tutorial
+runtime: shiny_prerendered
+---
+
+```{r setup, include=FALSE}
+library(learnr)
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+
+## 
+<h1> 政治学数据分析与编程 </h1>
+<h2> 第八讲 </h2>
+
+吕杰
+
+中国人民大学国际关系学院政治学系
+
+<script language=JavaScript>
+today=new Date();
+function initArray(){
+this.length=initArray.arguments.length
+for(var i=0;i<this.length;i++)
+this[i+1]=initArray.arguments[i] }
+var d=new initArray(
+"星期日",
+"星期一",
+"星期二",
+"星期三",
+"星期四",
+"星期五",
+"星期六");
+document.write(
+"<font color=#333 style='font-size:9pt;font-family: 楷体'> ",
+today.getFullYear(),"年",
+today.getMonth()+1,"月",
+today.getDate(),"日",
+d[today.getDay()+1],
+"</font>" );
+</script>
+
+## 内容提纲
+
++ 统计分析的逻辑和步骤
++ 统计描述
++ 假说检定
++ 不同的统计检定
+
+## 统计分析的逻辑
+样本（sample）到总体（population）
+
++ 为什么要抽样？
+  * 静态的逻辑（frequentist）
+  * 动态的逻辑（bayesian）
++ 样本到总体的推断有哪些问题？
+  * 一个样本（再抽一次如何？）
+  * 一段数据（再等一段新数据如何？）
+  
+## 统计分析的步骤
+统计分析都有哪些基本的步骤？
+
++ 确定统计指标（使用哪种检定程序？）
++ 计算统计指标（对应统计指标的值多大？）
++ 进行假说检定（对应假说检定的不确定性多大？）
++ 做出统计判断（如何决策？）
+
+## 基本统计概念
+概率
+
++ 特定事件（A、 B）和事件空间（S）
+  * $Pr(A) + Pr(B) = 1$
+  * $Pr(A) \in [0,1]$
+  * $Pr(B) \in [0,1]$
++ 不同类型的概率
+  * 联合概率（joint probability）： $Pr(AB)$
+  * 条件概率（conditional probability）：$Pr(A|B)$
+  * 边缘概率（marginal probability）： $Pr(A)$
+  
+## 不同概率之间的关系 I
+联合、条件、边缘概率的关系是什么样的？
+
++ $Pr(AB) = Pr(BA)$
++ $Pr(A) = \sum_B Pr(AB)$
++ $Pr(B) = \sum_A Pr(BA)$
++ $Pr(A|B) = \frac{Pr(AB)}{Pr(B)}$
++ $Pr(B|A) = \frac{Pr(BA)}{Pr(A)}$
+
+## 不同概率之间的关系 II
+贝叶斯公式（Bayesian Theorem）
+\[ Pr(A|B) = \frac{Pr(B|A)Pr(A)}{Pr(B)}，其中Pr(B) = \sum_APr(BA)\]
+
++ $Pr(A|B)$:后验概率
++ $Pr(A)$:先验概率
+
+## 不同概率之间的关系 III
+40到50岁的妇女中大约1%长有胸部肿瘤。这个年龄阶段妇女如果长有胸部肿瘤，进行胸部肿瘤X射线筛查，其检测结果90%会呈现阳性。这个年龄阶段妇女如果没有胸部肿瘤，进行胸部肿瘤X射线筛查，其检测结果10%会呈现假阳性。如果一位此年龄阶段的妇女胸部肿瘤X射线筛查的结果是阳性，她长有胸部肿瘤的概率多大？
+
++ A：长有胸部肿瘤
++ B：筛查结果是阳性
++ $Pr(A|B) = ？$
++ $Pr(B|A) = 90\%$
++ $Pr(A) = 1\%$
++ $Pr(B) = Pr(B|A)Pr(A) + Pr(B|A^n) ∗ Pr(A^n)$
+
+## 置信区间 I
+量化统计推断的不确定性（uncertainty）的一种方法
+
++ 基于一次抽样信息
++ 中央极限定律
++ 可能的区间范围
++ 如何合理解释置信区间？
+
+## 置信区间 II
+```{r inte, exercise=TRUE}
+suppressMessages(library(tidyverse))
+suppressMessages(library(cowplot))
+pop <- rnorm(5000, 0, 1)
+smean <- rep(NA, 4000)
+for (i in 1:1000){
+smean[i] <- mean(sample(pop, 10))
+smean[i+1000] <- mean(sample(pop, 50))
+smean[i+2000] <- mean(sample(pop, 100))
+smean[i+3000] <- mean(sample(pop, 500))
+}
+size <- rep(c("S10", "S50", "S100", "S500"), each = 1000)
+cisim <- as.data.frame(smean)
+cisim$size <- factor(size, labels = c("Size 10", "Size 50", "Size 100", "Size 500"))
+
+ggplot(cisim) +
+  geom_density(aes(x = smean), fill = "blue") +
+  facet_wrap(~size, nrow = 2) +
+  geom_vline(aes(xintercept = 0), col = "red")
+```
+
+
+## 置信区间 III
+```{r inte2, exercise=TRUE}
+suppressMessages(library(tidyverse))
+suppressMessages(library(cowplot))
+pop <- rnorm(5000, 0, 1)
+slb <- rep(NA, 100)
+sub <- rep(NA, 100)
+size <- 100
+for (i in 1:100){
+temp <- sample(pop, size)
+slb[i] <- mean(temp) - (sd(temp)/sqrt(size - 1))*1.96
+sub[i] <- mean(temp) + (sd(temp)/sqrt(size - 1))*1.96
+}
+ci95 <- as.data.frame(cbind(slb, sub))
+ci95$id <- seq(1, 100, by = 1)
+ci95$yes <- rep(NA, 100)
+ci95$yes <- ifelse(ci95$slb > 0 | ci95$sub < 0, 0, 1)
+ci95$yes <- factor(ci95$yes, labels = c("No", "Yes"))
+
+ggplot(ci95, aes(color = yes)) +
+  geom_segment(aes(x = slb, xend = sub,
+                   y = id, yend = id,
+                   col = yes)) +
+  geom_vline(aes(xintercept = 0)) +
+  labs(x = "95% CI Range", y = "Sample ID")
+```
+
+## 不同类型的统计推断错误
+针对原假说（$H_o$）和替代假说（$H_a$）的统计推断
+
++ 接受原假说（拒绝替代假说）
++ 拒绝原假说（接受替代假说）
+
+||统计推断错误类型||
+|:----:|:----:|:----:|
+| |$H_o$正确|$H_o$错误|
+|接受$H_o$|正确决定|II型错误|
+|拒绝$H_o$|I型错误|正确决定|
+| | |
+
+## 如何进行假说检定？
+假说检定的步骤
+
++ 设定原假说（$H_o$）
++ 设定替代假说（$H_a$）
++ 设定可接受的I型错误率（$\alpha$）
++ 计算对应的统计值
++ 计算对应的概率（p−value）
++ 比较p−value和$\alpha$的大小
++ 做出决策
+
+## 究竟什么是p−value？
+一个关键的条件概率（conditional probability）
+
++ Pr(SamplejHo)
++ 原假设正确的情况下，多大概率观察到样本值（及更极端值）
++ p−value 大
++ p−value 小
++ 多大算大？多小算小？
++ 主观判断
++ 跟预先设定的$\alpha$进行比较
+
+## 组别均值检定 I
+不同组别的集中趋势是否相同？
+$H_o : \mu_A = \mu_B$
+$H_o : \mu_{diff} = \mu_A − \mu_B = 0$
+```{r zbjz, exercise=TRUE}
+suppressMessages(library(tidyverse))
+mtcars$am <- factor(mtcars$am, labels= c("Manual", "Auto"))
+carwt <- mtcars %>%
+  group_by(am) %>%
+  summarise(wtmean = mean(wt))
+fig3 <- ggplot(data = carwt) +
+  geom_bar(aes(x = am, y = wtmean), stat = "identity") +
+  xlab("Transmission Type") +
+  ylab("Average Weight") +
+  ggtitle("Automobile Weight by Transimission Type")
+fig3
+```
+手动档和自动档汽车的平均自重差别为1.36吨。这个差异是系统存在的？还是仅仅是因为样本的特异性造成的？
+
+## 组别均值检定 II
+一般情况下的组别均值检定可以通过 Student’s t-test 来完成
+```{r zbjz2, exercise=TRUE}
+t.test(wt ~ am, data = mtcars)
+```
+
+## 组别均值检定 III
+Student’s t-test  
+对应t−value是5.494  
+对应的p−value是0  
+对应的$H_o : µ_{diff} = 0$  
+对应的$H_a : µ_{diff} \neq 0$
+
++ 如果提前设定的 $\alpha = 0.1$？
++ 如果提前设定的 $\alpha = 0.05$？
++ 如果提前设定的 $\alpha = 0.001$？
+
+## 相关关系检定 I
+变量之间的共变关系是否为零？
+$H_o : cov(A,B) = 0$
+$H_o : \rho_{ab} = 0$
+```{r cor1, exercise=TRUE}
+suppressMessages(library(tidyverse))
+ggplot(data = mtcars, aes(x = wt, y = mpg)) +
+  geom_point() +
+  geom_smooth(method = "lm", color = "red") +
+  xlab("Weight (tons)") +
+  ylab("Miles per Gallon") +
+  ggtitle("Automobiles MGP by Weight")
+```
+汽车自重和效率之间的负相关关系究竟有多强？这个关系究竟是系统存在的？还是因为小样本特异性导致的？
+
+## 相关关系检定 II
+```{r cor2, exercise=TRUE}
+test2 <- cor.test(~ wt + mpg, data = mtcars)
+test2
+```
+
+## 相关关系检定 III
+
+Student’s t-test
+对应的Pearson’s correlation coefficient: $\rho_{ab}$ 是-0.868
+对应t−value是-9.559
+对应的p−value是0
+对应的$H_o : \rho_{ab} = 0$
+对应的$H_a : \rho_{ab} \neq 0$
+如果提前设定的$\alpha = 0.1$？
+如果提前设定的$\alpha = 0.05$？
+如果提前设定的$\alpha = 0.001$？

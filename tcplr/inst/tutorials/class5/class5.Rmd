@@ -1,0 +1,208 @@
+---
+title: "class5"
+output: learnr::tutorial
+runtime: shiny_prerendered
+---
+
+```{r setup, include=FALSE}
+library(learnr)
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+## 
+<h1> 政治学数据分析与编程 </h1>
+<h2> 第五讲 </h2>
+
+吕杰
+
+中国人民大学国际关系学院政治学系
+
+<script language=JavaScript>
+today=new Date();
+function initArray(){
+this.length=initArray.arguments.length
+for(var i=0;i<this.length;i++)
+this[i+1]=initArray.arguments[i] }
+var d=new initArray(
+"星期日",
+"星期一",
+"星期二",
+"星期三",
+"星期四",
+"星期五",
+"星期六");
+document.write(
+"<font color=#333 style='font-size:9pt;font-family: 楷体'> ",
+today.getFullYear(),"年",
+today.getMonth()+1,"月",
+today.getDate(),"日",
+d[today.getDay()+1],
+"</font>" );
+</script>
+
+## 内容提纲
+
++ Tidy 数据
++ 数据整理：利用 R 自带的功能
++ 数据整理：利用 dplyr 功能包
+
+## Tidy 数据的特点和优势
+
+Tidy 数据有哪些特点呢？
+
++ 每个变量独占一列
++ 每个观测值独占一行
++ 每个数据独占一个位置
+
+为什么要求使用 Tidy 数据呢？
+
++ 前后一致的数据存储方式便于管理和处理
++ R 自带各种函数特别适合于处理每个变量独占一行的数据
+
+## 是 Tidy 数据吗？
+```{r tidy, exercise=TRUE}
+nation1 <- rep(c("A", "B", "C"), each = 2)
+year1 <- rep(c(2000, 2010), 3)
+gdp <- c(1000, 1500, 500, 400, 5000, 8000)
+popsize <- c(5000, 5010, 2000, 2050, 10000, 10500)
+data1 <- as.data.frame(cbind(year1, gdp, popsize))
+data1$nation1 <- nation1
+head(data1, 4)
+```
+
+```{r td2, exercise=TRUE}
+nation2 <- rep(c("A", "B", "C"), each = 4)
+year2 <- rep(c(2000, 2010), 6)
+info <- rep(c("gdp", "gdp", "popsize", "popsize"), 3)
+value <- c(1000, 1500, 5000, 5010, 500, 400, 2000, 2050, 5000, 4000, 1000, 1500)
+data2 <- as.data.frame(cbind(year2, info, value))
+data2$nation2 <- nation2
+head(data2, 4)
+```
+
+## 选取特定变量
+```{r slt, exercise=TRUE}
+suppressMessages(library(tidyverse))
+air1 <- airquality[, c(1, 4)]
+head(air1, 3)
+```
+```{r slt2, exercise=TRUE}
+suppressMessages(library(tidyverse))
+air2 <- airquality[, -c(2, 3, 5, 6)]
+head(air2, 3)
+```
+
+## 选取特定观测值 I
+只对 5 月的观测值感兴趣
+```{r slt3, exercise=TRUE}
+suppressMessages(library(tidyverse))
+air3 <- airquality[airquality$Month == 5,]
+head(air3)
+```
+
+## 选取特定观测值 II
+只对 5 月的观测值感兴趣，而且臭氧有观测值
+```{r slt4, exercise=TRUE}
+suppressMessages(library(tidyverse))
+air4 <- airquality[airquality$Month == 5 &!is.na(airquality$Ozone),]
+head(air4)
+```
+
+## 生成新变量
+常规的算术和逻辑运算都可以用来利用现有变量生成新的变量。
+```{r slt5, exercise=TRUE}
+ncars <- mtcars[, c(1, 2, 4, 6, 9)]
+ncars$wtperhp <- ncars$wt/ncars$hp
+ncars$supeff <- ncars$am ==1 & ncars$mpg > 20
+head(ncars)
+```
+
+## 变量值重新编码
+变量重新编码可以改善测量的效度和信度，也可以概念的操作化更加贴近理论概念的核心内容。
+```{r recode, exercise=TRUE}
+ncars <- mtcars[, c(1, 2, 4, 6, 9)]
+ncars$wtperhp <- ncars$wt/ncars$hp
+ncars$supeff <- ncars$am ==1 & ncars$mpg > 20
+ncars$effcat <- ifelse(ncars$mpg < 15, 1,
+                  ifelse(ncars$mpg < 20, 2,
+                    ifelse(ncars$mpg < 25, 3, 4)))
+summary(ncars$mpg)
+table(ncars$effcat, useNA = "ifany")
+```
+
+## 数据合并
+数据合并的主要目的：增加观测值，增加新变量
+
+<h3>增加新变量</h3>
+```{r meg, exercise=TRUE}
+air5 <- airquality[, c(1, 2, 3)]
+air6 <- airquality[, c(4, 5, 6)]
+air.m1 <- cbind(air5, air6)
+all_equal(air.m1, airquality)
+```
+
+<h3>增加新观测值</h3>
+```{r obe, exercise=TRUE}
+air7 <- airquality[c(1:60), ]
+air8 <- airquality[c(61:153), ]
+air.m2 <- rbind(air7, air8)
+all_equal(air.m2, airquality)
+```
+
+## select函数
+dplyr是一个功能非常强大的数据整理功能包，一般常用的数据整理功能都能在dplyr中找到，包括变量的选择，观测值的筛分，变量的转化等我们之前在R的基本功能中已经熟悉的。dplyr功能包还能依照特定的要求分组压缩变量，比如组别的均值、特定比例值等等。
+```{r slt6, exercise=TRUE}
+suppressMessages(library(dplyr))
+air1.dp <- select(airquality, Ozone, Solar.R, Wind)
+head(air1.dp, 1)
+```
+```{r slt7, exercise=TRUE}
+suppressMessages(library(dplyr))
+air2.dp <- select(airquality, -Ozone)
+head(air2.dp, 1)
+```
+
+## filter函数
+```{r flt, exercise=TRUE}
+suppressMessages(library(dplyr))
+air3.dp <- filter(airquality, Month == 5)
+dim(air3.dp)
+```
+```{r flt2, exercise=TRUE}
+suppressMessages(library(dplyr))
+air4.dp <- filter(airquality, Month == 5 & !is.na(Ozone))
+dim(air4.dp)
+```
+
+## mutate函数
+```{r mtt, exercise=TRUE}
+suppressMessages(library(dplyr))
+ncars <- mtcars
+ncars <- mutate(ncars, wtperhp = wt/hp)
+ncars <- mutate(ncars, effcat = if_else(mpg < 15, 1,
+                                  if_else(mpg < 20, 2, 3)))
+summary(ncars$wtperhp)
+table(ncars$effcat, useNA = "ifany")
+```
+
+## group_by函数
+
+组别特征的往往是数据分析中很重要的一个步骤，尤其是涉及到把微观数据向宏观数据聚合的过程，比如一个社会的某个均值，某个百分比等等。在多层的统计推断中，宏观环境特征往往是通过组别特征来识别的。
+
+```{r gb, exercise=TRUE}
+suppressMessages(library(dplyr))
+ncars <- group_by(mtcars, am)
+ncars.gp1 <- summarise(ncars, mpg.mean = mean(mpg), mpg.median = median(mpg))
+ncars.gp1
+```
+
+## 管道（pipe）
+数据的整理往往需要很多步骤来推进，若每一步都用一个命令来执行，前后数据的传递往往会变得比较复杂。R有一个很高效的方式来处理类似的问题，叫做管道（pipe）。在R的语法中通过`%>%`来实现。
+```{r pp, exercise=TRUE}
+suppressMessages(library(dplyr))
+ncars.gp2 <- mtcars %>%
+  mutate(wtperhp = wt/hp) %>%
+  group_by(am) %>%
+  summarise(wtperhp.mean = mean(wtperhp), wtperhp.median = median(wtperhp))
+ncars.gp2
+```

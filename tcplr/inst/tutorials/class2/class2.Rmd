@@ -1,0 +1,188 @@
+---
+title: "class2"
+output: learnr::tutorial
+runtime: shiny_prerendered
+---
+
+```{r setup, include=FALSE}
+library(learnr)
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+## 
+<h1> 政治学数据分析与编程 </h1>
+<h2> 第二讲 </h2>
+
+吕杰
+
+中国人民大学国际关系学院政治学系
+
+<script language=JavaScript>
+today=new Date();
+function initArray(){
+this.length=initArray.arguments.length
+for(var i=0;i<this.length;i++)
+this[i+1]=initArray.arguments[i] }
+var d=new initArray(
+"星期日",
+"星期一",
+"星期二",
+"星期三",
+"星期四",
+"星期五",
+"星期六");
+document.write(
+"<font color=#333 style='font-size:9pt;font-family: 楷体'> ",
+today.getFullYear(),"年",
+today.getMonth()+1,"月",
+today.getDate(),"日",
+d[today.getDay()+1],
+"</font>" );
+</script>
+
+## 内容提纲
+
++ 为什么用 R？
++ R 的特点
++ R 的功能包
++ R 的编辑器
+
+## 不同数据分析软件的对比
+<table><tr>
+<td><img src=https://mms0.baidu.com/it/u=2492368923,157053235&fm=15&gp=0.jpg&fmt=auto width="300"></td>
+<td> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </td>
+<td><img src=https://mms0.baidu.com/it/u=430231599,3185291240&fm=15&gp=0.jpg&fmt=auto width="300"></td>
+</tr></table>
+
+## R 的优势
++ 开源、免费
++ 匹配所有的操作系统
++ 出众的可视化功能和绘图工具
++ 可以同时操作多个数据框
++ 极高的可复制性
++ 活跃强大的延伸功能包开发社区
+
+## R 什么样子？
+
+![](https://www.pianshen.com/images/257/d55e4222570dfb8744d32814788a8171.png)
+     
+## R 基本语句和语法习惯（一）
+
+```{r assignment, exercise=TRUE, exercise.lines = 5}
+# Assignment symbol <-
+p <- 3 + 5
+p
+```
+
+```{r display, exercise=TRUE, exercise.lines = 5}
+# Display results
+3 + 5
+```
+
+```{r create, exercise=TRUE, exercise.lines = 5}
+# Create a vector with 9 values
+vector <- c(rep(0, 3), rep(1, 3), rep(2, 3))
+vector
+```
+
+## R 基本语句和语法习惯（二）
+```{r vector, exercise=TRUE, exercise.lines = 5}
+# Vector operation
+v2 <- rep(c(1, 2, 3), 3)
+v3 <- rep(c(4, 5, 6), 3)
+v4 <- c(v2, v3)
+v2
+v3
+v4
+```
+
+```{r matrix, exercise=TRUE, exercise.lines = 5}
+# Matrix operation
+mx.1 <- matrix(c(1, 2, 3, 4, 5, 6),
+nrow = 2, ncol = 3,
+byrow = T)
+colnames(mx.1) <- c("c1", "c2", "c3")
+rownames(mx.1) <- c("r1", "r2")
+```
+
+## R 基本语句和语法习惯（三）
+```{r dataframe, exercise=TRUE, exercise.lines = 5}
+# Data frame operation
+dim(mtcars)
+```
+
+```{r head, exercise=TRUE, exercise.lines = 5}
+head(mtcars, n = 2)
+```
+
+```{r tail, exercise=TRUE, exercise.lines = 5}
+tail(mtcars, n = 2)
+```
+
+## R 基本语句和语法习惯（四）
+```{r list, exercise=TRUE, exercise.lines = 5}
+# List operation
+v5 <- c(1, 2, 3)
+v6 <- c("RUC", "THU", "PKU", "FDU")
+v7 <- list(rank = v5, name = v6)
+v7[[1]]
+```
+
+## R 基本语句和语法习惯（五）
+
+人工仿真正态分布
+
+```{r simulation, exercise=TRUE, exercise.lines = 5}
+# Simulate a normal distribution with 500 values
+sim.norm <- rnorm(500, mean = 0, sd = 1)
+summary(sim.norm)
+str(sim.norm)
+```
+
+能清楚看到仿真正态分布的均值是-0.0585359
+
+## R 基本语句和语法习惯（六）
+
+仿真正态分布的图示
+```{r simulation2, exercise=TRUE, exercise.lines = 5}
+# Visualize the simulated normal distribution
+sim.norm <- rnorm(500, mean = 0, sd = 1)
+hist(sim.norm, col = "blue", main = "", probability = T)
+lines(density(sim.norm), col = "red")
+```
+
+## R 自带的功能包
++ 涵盖基本的数据计算功能
++ 涵盖基本的统计模型
++ 涵盖基本的数据可视化工具
++ 一程度的编程配合基本功能解决绝大部分的问题
++ 有效使用需要一定程度的数学和统计知识
+
+## R 社区衍生发展的功能包 
++ 针对特定需求的功能包
++ 在 R 基本功能包的基础上开发
++ 开发者自己维护
++ 同一功能不同人开发各自的功能包
++ 使用者自己承担责任
+
+## R 功能包的使用
+衍生功能包使用之前需要安装，并在使用前载入 R 环境
+```{r package, exercise=TRUE, exercise.lines = 5}
+suppressMessages(library(ggplot2))
+mtcars$am <- factor(mtcars$am, labels = c("Automatic", "Manual"))
+ggplot(data = mtcars, aes(x = hp, y = mpg, color = am)) +
+geom_point() +
+geom_smooth(method = "loess")
+```
+
+## 为什么需要编辑器
++ 单行命令输入
++ 可复制性低
++ 互动性低
+
+## 常用的编辑器 R Studio
++ 针对 R 特性而量身定做
++ 日益丰富和强大的数据产品功能
++ 无缝衔接 R 和其他文本编辑软件，比如$\LaTeX$
+
+<img src="https://www.analyticsvidhya.com/wp-content/uploads/2016/02/rstudio.jpg" width=750"/>)

@@ -1,0 +1,228 @@
+---
+title: "class3"
+output: learnr::tutorial
+runtime: shiny_prerendered
+---
+
+```{r setup, include=FALSE}
+library(learnr)
+knitr::opts_chunk$set(echo = FALSE)
+```
+## 
+<h1> 政治学数据分析与编程 </h1>
+<h2> 第三讲 </h2>
+
+吕杰
+
+中国人民大学国际关系学院政治学系
+
+<script language=JavaScript>
+today=new Date();
+function initArray(){
+this.length=initArray.arguments.length
+for(var i=0;i<this.length;i++)
+this[i+1]=initArray.arguments[i] }
+var d=new initArray(
+"星期日",
+"星期一",
+"星期二",
+"星期三",
+"星期四",
+"星期五",
+"星期六");
+document.write(
+"<font color=#333 style='font-size:9pt;font-family: 楷体'> ",
+today.getFullYear(),"年",
+today.getMonth()+1,"月",
+today.getDate(),"日",
+d[today.getDay()+1],
+"</font>" );
+</script>
+
+## 内容提纲
+
++ 编程的基本逻辑
++ 条件判断
++ 循环
++ R 的函数
+
+## 操作步骤的拆分
+<table><tr>
+<td><img src=https://mms0.baidu.com/it/u=1788962346,1205858096&fm=15&gp=0.jpg&fmt=auto width="300"></td>
+<td> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </td>
+<td><img src=https://mms0.baidu.com/it/u=2328768762,3901885881&fm=15&gp=0.jpg&fmt=auto width="300"></td>
+</tr></table>
+
+
+## 条件和循环
+<table><tr>
+<td><img src=https://mms0.baidu.com/it/u=2287950467,3786923659&fm=15&gp=0.jpg&fmt=auto width="300"></td>
+<td> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </td>
+<td><img src=https://mms0.baidu.com/it/u=3563501602,3117234932&fm=27&gp=0.jpg&fmt=auto width="300"></td>
+</tr></table>
+
+## 条件判断（一）
+```{r if, exercise=TRUE}
+# IF statemet
+x <- runif(1, min = 0, max = 1)
+if (x > 0.5) {
+print("My lucky day!")
+} else
+print("I should stay at home!")
+```
+
+## 条件判断（二）
+```{r if2, exercise=TRUE}
+# Multiple IF statemets
+x <- runif(1, min = 0, max = 1)
+if (x < 0.3) {
+print("I should stay at home!")
+} else if (x < 0.7) {
+print("Maybe I can try my luck?!")
+} else
+print("Definitely my lucky day!")
+```
+
+## FOR 循环（一）
+```{r for, exercise=TRUE}
+# FOR loop with known rounds
+for (i in 1:5){
+print (paste(i, "raised to the power of 2 is", i^2))
+}
+```
+
+## FOR 循环（二）
+```{r for2, exercise=TRUE}
+j <- 0
+for (i in 1:100){
+j <- j + 1
+}
+j
+```
+
+```{r for3, exercise=TRUE}
+j <- 0
+for (i in 1:100){
+j <- j + i
+}
+j
+```
+
+## FOR 循环（三）
+```{r for4, exercise=TRUE}
+# Nested FOR loops
+for (i in 4:5){
+for (j in 2:3){
+print (paste(i, "raised to the power of", j, "is", i^j))
+}
+}
+```
+
+
+## WHILE 循环（一）
+```{r while, exercise=TRUE}
+# WHILE loop with unknown rounds
+luck <- 0
+i <- 0
+while (luck < 0.5){
+luck <- runif(1, min = 0, max = 1)
+i <- i + 1
+}
+if (i == 1) {
+print(paste("It just take me 1 draw to get lucky!"))
+} else
+print (paste("It takes", i, "draws to get lucky!"))
+```
+
+## WHILE 循环（二）
+```{r while2, exercise=TRUE}
+p <- 0.3
+n <- 5000
+s <- rep(NA, n)
+for (i in 1:n){
+j <- 0
+t <- 0
+while (j < 2){
+j <- j + rbinom(1, 1, p)
+t <- t + 1
+}
+s[i] <- t
+}
+```
+
+## WHILE 循环（三）
+```{r while3, exercise=TRUE}
+p <- 0.3
+n <- 5000
+s <- rep(NA, n)
+for (i in 1:n){
+j <- 0
+t <- 0
+while (j < 2){
+j <- j + rbinom(1, 1, p)
+t <- t + 1
+}
+s[i] <- t
+}
+hist(s, main = "Simulated Needed Draws for Only 2 Shots")
+```
+
+通过不超过 10 次尝试刚好获得 2 次成功的概率是 0.8544。
+
+## 为什么用函数？
++ 相对复杂的计算步骤
++ 重复之用的机会较多
++ 相对稳定的的参数
++ 只在乎输入输出
++ 自定义函数方便使用者设定
+
+## 函数操作（一）
+```{r fun, exercise=TRUE}
+myfun <- function(x){
+y <- x^2
+print(paste("You want to calcualte the square of", x))
+print(paste("Here is the result:", y))
+}
+myfun(4)
+myfun(10)
+```
+
+## 函数操作（二）
+```{r fun2, exercise=TRUE}
+# Self-defined fucntions with multiple parameters
+myfmm <- function(p, c, n){
+s <- rep(NA, n)
+for (i in 1:n){
+j <- 0
+t <- 0
+while (j < 2){
+j <- j + rbinom(1, 1, p)
+t <- t + 1
+}
+s[i] <- t
+}
+return(mean(s < (c + 1)))
+}
+```
+
+## 函数操作（三）
+```{r fun3, exercise=TRUE}
+# Self-defined fucntions with multiple parameters
+myfmm <- function(p, c, n){
+s <- rep(NA, n)
+for (i in 1:n){
+j <- 0
+t <- 0
+while (j < 2){
+j <- j + rbinom(1, 1, p)
+t <- t + 1
+}
+s[i] <- t
+}
+return(mean(s < (c + 1)))
+}
+result <- myfmm(0.3, 10, 5000)
+result
+```
+
+如果每次投篮的命中率为 30% ，那么不超过 10 次投篮仅命中 2 次的概率为0.8526。

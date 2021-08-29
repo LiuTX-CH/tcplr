@@ -1,0 +1,131 @@
+---
+title: "class1"
+output: learnr::tutorial
+runtime: shiny_prerendered
+---
+
+```{r setup, include=FALSE}
+library(learnr)
+knitr::opts_chunk$set(echo = FALSE)
+```
+## 
+<h1> 政治学数据分析与编程 </h1>
+<h2> 第一讲 </h2>
+
+吕杰
+
+中国人民大学国际关系学院政治学系
+
+<script language=JavaScript>
+today=new Date();
+function initArray(){
+this.length=initArray.arguments.length
+for(var i=0;i<this.length;i++)
+this[i+1]=initArray.arguments[i] }
+var d=new initArray(
+"星期日",
+"星期一",
+"星期二",
+"星期三",
+"星期四",
+"星期五",
+"星期六");
+document.write(
+"<font color=#333 style='font-size:9pt;font-family: 楷体'> ",
+today.getFullYear(),"年",
+today.getMonth()+1,"月",
+today.getDate(),"日",
+d[today.getDay()+1],
+"</font>" );
+</script>
+
+## 内容提纲
+
++ 传统政治学实证研究
++ 新兴数据科学
++ 数据分析流程和模式的变化
++ 为什么要学习编程？
++ 开源软件
+
+## 社会科学实证研究的基本逻辑
+
++ 理论、假说、操作化、数据、模型检验、结论
++ 经典案例
+
+<table><tr>
+<td><img src=https://mms0.baidu.com/it/u=2646680484,908231959&fm=27&gp=0.jpg&fmt=auto width="300"></td>
+<td> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </td>
+<td><img src=https://mms0.baidu.com/it/u=4238864527,731053748&fm=15&gp=0.jpg&fmt=auto width="300"></td>
+</tr></table>
+
+## 传统实证研究的黑箱
++ 操作化的黑箱
++ 数据采集的黑箱
++ 模型检验的黑箱
++ 危害和挑战？
++ 透明性？可重复性？稳健性？
+
+![](https://mms0.baidu.com/it/u=1647370019,530976827&fm=15&gp=0.jpg&fmt=auto)
+
+## 数据科学的兴起
++ 统计学（统计推断）
++ 计算科学（算法和数据存储）
++ 数据类型的丰富和拓展（结构和非结构化数据）
+
+<table><tr>
+<td><img src=https://mms0.baidu.com/it/u=2381746573,1147953152&fm=15&gp=0.jpg&fmt=auto width="200"></td>
+<td> &nbsp;&nbsp; </td>
+<td><img src=https://mms0.baidu.com/it/u=379857867,541411900&fm=15&gp=0.jpg&fmt=auto width="200"></td>
+<td> &nbsp;&nbsp; </td>
+<td><img src=https://mms0.baidu.com/it/u=838847302,2939117288&fm=27&gp=0.jpg&fmt=auto width="200"></td>
+</tr></table>
+
+## 数据科学和传统数据分析的差异
++ 一个独立的学科
++ 关注数据自身的特性
++ 用丰富的工具来交流和呈现数据特点
+
+![](https://mms0.baidu.com/it/u=4205531236,1876623444&fm=15&gp=0.jpg&fmt=auto)
+
+## 传统社会科学数据分析流程和模式
+强调理论先行，验证性分析为主
+
++ 理论指导模型的设定
++ 理论确定前尽量少看数据
++ 尽量避免 Curve-fitting
++ 数据分析的核心目的是验证理论
+
+<td><img src=https://mms0.baidu.com/it/u=54844597,2226833714&fm=27&gp=0.jpg&fmt=auto width="300"></td>
+
+
+## 数据科学的数据分析流程和模式
+强调对数据的理解，探索性和验证性分析并行
+
++ 强调数据信息的价值
++ 更加灵活的模型设定（避免过分简单的线性假设）
++ 强调数据和理论的对话
++ 探索性数据分析对理论发展的价值
+
+![](https://mms0.baidu.com/it/u=4082728108,3686366775&fm=15&gp=0.jpg&fmt=auto)
+
+## 编程和我有关吗？
++ 你做的事情有前后逻辑的安排吗？
++ 你做的事情需要多次重复同样的操作吗？
++ 经典案例
+
+![](https://mms0.baidu.com/it/u=563378992,3162170827&fm=15&gp=0.jpg&fmt=auto)
+
+## 编程的核心逻辑
++ 条件（Conditions）
++ 循环（Loops）
++ 组合
+
+<img src=https://mms0.baidu.com/it/u=626962080,3751512999&fm=15&gp=0.jpg&fmt=auto width = "300"/>
+
+## 开源软件的价值和意义
++ 知识的共享
++ 过程的透明和可追溯
++ 操作的灵活
++ 客制化的调整
+
+![](https://mms0.baidu.com/it/u=682416981,108272061&fm=27&gp=0.jpg&fmt=auto)

@@ -1,0 +1,271 @@
+---
+title: "class12"
+output: learnr::tutorial
+runtime: shiny_prerendered
+---
+
+```{r setup, include=FALSE}
+library(learnr)
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+
+## 
+<h1> 政治学数据分析与编程 </h1>
+<h2> 第十二讲 </h2>
+
+吕杰
+
+中国人民大学国际关系学院政治学系
+
+<script language=JavaScript>
+today=new Date();
+function initArray(){
+this.length=initArray.arguments.length
+for(var i=0;i<this.length;i++)
+this[i+1]=initArray.arguments[i] }
+var d=new initArray(
+"星期日",
+"星期一",
+"星期二",
+"星期三",
+"星期四",
+"星期五",
+"星期六");
+document.write(
+"<font color=#333 style='font-size:9pt;font-family: 楷体'> ",
+today.getFullYear(),"年",
+today.getMonth()+1,"月",
+today.getDate(),"日",
+d[today.getDay()+1],
+"</font>" );
+</script>
+
+## 内容提纲
+
++ 回归模型交互项的可视化
++ 模型预测
+
+## 交互作用的合理解读
+
+有条件的影响力（conditional impact）
+
+$M_1: Y = \beta_0 + \beta_1X_1 + \beta_2X_2 + \epsilon_0$
+
+$M_2: Y = \beta_0 + \beta_1X_1 + \beta_2X_2 + \beta_3X_1X_2 + \epsilon_0$
+
++ M1 中 X1 和 X2 独立发挥影响，其影响力不受另外一变量值的影响
+  * X1 的影响力为 $\beta_1$
+  * X2 的影响力为 $\beta_2$
++ M2 中 X1 和 X2 互动发挥影响，其影响力受到另外一变量值的影响
+  * X1 的影响力为 $\beta_1+ \beta_3X_2$
+  * X2 的影响力为 $\beta_2+ \beta_3X_1$
+  
+## 交互作用的相关信息  
+
+呈现交互作用需要的信息：
+
++ 系数参数的估计值
++ 不确定性的估计值
+
+从哪里却找相关信息呢？
+
+$Y = \beta_0 + \beta_1X_1 + \beta_2X_2 + \beta_3X_1X_2 + \epsilon_0$
+
++ 可直接找到的信息
+  * $\beta_1$ 及对应的标准误
+  * $\beta_2$ 及对应的标准误
+  * $\beta_3$ 及对应的标准误
++ 不能直接找到的信息
+  * $\beta_1+ \beta_3X_2$及对应的标准误
+  * $\beta_2+ \beta_3X_1$及对应的标准误
+  * 标准误的数学运算相对复杂（比如， Delta 方法， Bootstrap 方法）
+  
+## margins 软件包
+计算对应的边际效应（marginal effects）
+
++ 边际效应: $ME = \frac{dy}{dx}$
++ 均值的边际效应: $MEM = \frac{dy}{dx}, when\quad z = mean(z)$
++ 平均边际效应: $AME = Average(\frac{dy}{dx}), over\quad all\quad z$
+
+一般OLS模型，如果没有交互项
+
++ $ME = MEM = AME$
+
+一般 OLS 模型，如果有交互项，不涉及交互的变量
+
++ $ME = MEM = AME$
+
+一般 OLS 模型，如果有交互项，涉及到交互的变量
+
++ $ME \neq MEM \neq AME$
+
+一般 GLS 模型
+
++ $ME \neq MEM \neq AME$
+
+## margins 应用 I
+```{r ma1, exercise=TRUE}
+mtcars$am <- factor(mtcars$am, labels = c("Manu", "Auto"))
+ols.result <- lm(mpg ~ wt + am + wt:am, data = mtcars)
+summary(ols.result)
+```
+
+## margins 应用 II
+```{r ma2, exercise=TRUE}
+suppressMessages(library(margins))
+mtcars$am <- factor(mtcars$am, labels = c("Manu", "Auto"))
+ols.result <- lm(mpg ~ wt + am + wt:am, data = mtcars)
+margins(ols.result)
+summary(margins(ols.result))
+```
+
+## margins 应用 III
+```{r ma3, exercise=TRUE}
+suppressMessages(library(margins))
+mtcars$am <- factor(mtcars$am, labels = c("Manu", "Auto"))
+ols.result <- lm(mpg ~ wt + am + wt:am, data = mtcars)
+summary(margins(ols.result, variables = "wt", at = list(am = c("Manu", "Auto"))))
+```
+
+## margins 应用 IV
+```{r ma4, exercise=TRUE}
+suppressMessages(library(margins))
+mtcars$am <- factor(mtcars$am, labels = c("Manu", "Auto"))
+ols.result <- lm(mpg ~ wt + am + wt:am, data = mtcars)
+wt.sim <- seq(0, 5, by = 1)
+summary(margins(ols.result, variables = "am", at = list(wt = wt.sim)))
+```
+
+## margins 应用 V
+```{r ma5, exercise=TRUE}
+suppressMessages(library(margins))
+suppressMessages(library(tidyverse))
+mtcars$am <- factor(mtcars$am, labels = c("Manu", "Auto"))
+ols.result <- lm(mpg ~ wt + am + wt:am, data = mtcars)
+wt.sim <- seq(0, 5, by = 1)
+am.margin <- summary(margins(ols.result, variables = "am", at = list(wt = wt.sim)))
+
+ggplot(data = am.margin, aes(x = wt)) +
+  geom_line(aes(y = AME)) +
+  geom_ribbon(aes(ymin = lower, ymax = upper), alpha = 0.5) +
+  geom_hline(aes(yintercept = 0), linetype = "dotted") +
+  ylab("Marginal Impact") +
+  xlab("Weight of Automobiles (tons)") +
+  ggtitle("Condiontlal Impact of Transmissition on Fuel Efficiency \n (Automatic vs. Manual)")
+```
+
+## margins 应用 VI
+```{r ma6, exercise=TRUE}
+suppressMessages(library(margins))
+suppressMessages(library(tidyverse))
+mtcars$am <- factor(mtcars$am, labels = c("Manu", "Auto"))
+ols.result <- lm(mpg ~ wt + am + wt:am, data = mtcars)
+wt.margin <- summary(margins(ols.result, variables = "wt",
+at = list(am = c("Manu", "Auto"))))
+ggplot(data = wt.margin, aes(x = am)) +
+  geom_pointrange(aes(y = AME, ymin = lower, ymax = upper))+
+  ylab("Marginal Impact") +
+  xlab("Transimission Type") +
+  scale_x_discrete(labels = c("Manual", "Automatic")) +
+  ggtitle("Condiontlal Impact of Weight on Fuel Efficiency \n (tons)")
+```
+
+## 模型预测的逻辑
+以模型的参数估值为基础
+
++ 假定模型设定无误
++ 假定参数估值无偏
++ 带入解释变量进行预测
+  * 特定解释变量组合的可能结果（within sample）
+  * 新情景的判断（out of sample）
+
+## 选择哪种不确定性呢？
+置信区间（confidence interval）？预测区间（prediction interval）？
+
++ 置信区间： $\bar{x} \pm t_{1-\frac{\alpha}{2},n-1}s\sqrt{\frac{1}{n}}$
++ 预测区间： $\bar{x} \pm t_{1-\frac{\alpha}{2},n-1}s\sqrt{\frac{1}{n}+1}$
++ CI 对应的是均值（mean value）预测的不确定性
++ PI 对应的是特定值（particular value）预测的不确定性
++ 驱动 CI 的主要是抽样误差
++ 驱动 PI 的除了抽样误差，还有样本分布自身的差异
++ 在依赖模型的预测中， PI 还要包括参数自身的不确定性
+
+## predict 函数进行预测 I
+
+```{r ma7, exercise=TRUE}
+mtcars$am <- factor(mtcars$am, labels = c("Manu", "Auto"))
+ols.result <- lm(mpg ~ wt + am + wt:am, data = mtcars)
+
+wt <- rep(seq(0.5, 6, by = 0.5), 2)
+am <- rep(c(0, 1), each = 12)
+sim.data <- as.data.frame(cbind(wt, am))
+sim.data$am <- factor(sim.data$am, labels = c("Manu", "Auto"))
+sim1 <- predict.lm(ols.result, sim.data,
+interval = "confidence", level = 0.95)
+sim2 <- predict.lm(ols.result, sim.data,
+interval = "prediction", level = 0.95)
+sim1 <- cbind.data.frame(sim.data, sim1)
+sim2 <- cbind.data.frame(sim.data, sim2)
+```
+
+
+## predict 函数进行预测 I
+```{r ma8, exercise=TRUE}
+suppressMessages(library(tidyverse))
+mtcars$am <- factor(mtcars$am, labels = c("Manu", "Auto"))
+ols.result <- lm(mpg ~ wt + am + wt:am, data = mtcars)
+
+wt <- rep(seq(0.5, 6, by = 0.5), 2)
+am <- rep(c(0, 1), each = 12)
+sim.data <- as.data.frame(cbind(wt, am))
+sim.data$am <- factor(sim.data$am, labels = c("Manu", "Auto"))
+sim1 <- predict.lm(ols.result, sim.data,
+interval = "confidence", level = 0.95)
+sim2 <- predict.lm(ols.result, sim.data,
+interval = "prediction", level = 0.95)
+sim1 <- cbind.data.frame(sim.data, sim1)
+sim2 <- cbind.data.frame(sim.data, sim2)
+
+ggplot(data = sim1, aes(x = wt, fill = am)) +
+  geom_line(aes(y = fit)) +
+  geom_ribbon(aes(ymin = lwr, ymax = upr), alpha = 0.5) +
+  scale_x_continuous(breaks = seq(1, 6, by = 1)) +
+  scale_y_continuous(limits = c(-20, 50),
+                     breaks = seq(-20, 50, by = 5)) +
+  scale_fill_discrete(name = "Transmission",
+                      labels = c("Manual", "Automatic")) +
+  xlab("Vehicle Weight (tons)") +
+  ylab("Predicted Fuel Efficiency (mpg)") +
+  ggtitle("Predicted MPG by Weight and Transmission \n (with 95% CIs)")
+```
+
+## predict 函数进行预测 II
+```{r ma9, exercise=TRUE}
+suppressMessages(library(tidyverse))
+mtcars$am <- factor(mtcars$am, labels = c("Manu", "Auto"))
+ols.result <- lm(mpg ~ wt + am + wt:am, data = mtcars)
+
+wt <- rep(seq(0.5, 6, by = 0.5), 2)
+am <- rep(c(0, 1), each = 12)
+sim.data <- as.data.frame(cbind(wt, am))
+sim.data$am <- factor(sim.data$am, labels = c("Manu", "Auto"))
+sim1 <- predict.lm(ols.result, sim.data,
+interval = "confidence", level = 0.95)
+sim2 <- predict.lm(ols.result, sim.data,
+interval = "prediction", level = 0.95)
+sim1 <- cbind.data.frame(sim.data, sim1)
+sim2 <- cbind.data.frame(sim.data, sim2)
+
+ggplot(data = sim2, aes(x = wt, fill = am)) +
+  geom_line(aes(y = fit)) +
+  geom_ribbon(aes(ymin = lwr, ymax = upr), alpha = 0.5) +
+  scale_x_continuous(breaks = seq(1, 6, by = 1)) +
+  scale_y_continuous(limits = c(-20, 50),
+                     breaks = seq(-20, 50, by = 5)) +
+  scale_fill_discrete(name = "Transmission",
+                      labels = c("Manual", "Automatic")) +
+  xlab("Vehicle Weight (tons)") +
+  ylab("Predicted Fuel Efficiency (mpg)") +
+  ggtitle("Predicted MPG by Weight and Transmission \n (with 95% PIs)")
+```

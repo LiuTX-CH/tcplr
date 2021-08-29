@@ -1,0 +1,232 @@
+---
+title: "class6"
+output: learnr::tutorial
+runtime: shiny_prerendered
+---
+
+```{r setup, include=FALSE}
+library(learnr)
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+## 
+<h1> 政治学数据分析与编程 </h1>
+<h2> 第六讲 </h2>
+
+吕杰
+
+中国人民大学国际关系学院政治学系
+
+<script language=JavaScript>
+today=new Date();
+function initArray(){
+this.length=initArray.arguments.length
+for(var i=0;i<this.length;i++)
+this[i+1]=initArray.arguments[i] }
+var d=new initArray(
+"星期日",
+"星期一",
+"星期二",
+"星期三",
+"星期四",
+"星期五",
+"星期六");
+document.write(
+"<font color=#333 style='font-size:9pt;font-family: 楷体'> ",
+today.getFullYear(),"年",
+today.getMonth()+1,"月",
+today.getDate(),"日",
+d[today.getDay()+1],
+"</font>" );
+</script>
+
+## 内容提纲
++ 数据可视化
++ 数据可视化：利用 R 自带的可视化工具
++ 数据可视化：利用 ggplot2 功能包
+
+## 什么是数据可视化？
+
+通过图形方式来来呈现数据
+
++ 17 世纪就出现了饼图（pie chart）
++ Charles Minard (1861)
++ 多重信息的叠加
++ 计算机技术的飞速发展
+
+<h4> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 1812 年拿破仑对俄国的战役 </h4>
+<img src="https://mms0.baidu.com/it/u=2505111612,555981666&fm=15&gp=0.jpg&fmt=auto" width=700/>
+
+## 数据可视化的好处
+人脑处理信息的特点决定了视觉刺激的优势
+
++ 快捷有效地传递信息
++ 动态的方式传递信息
++ 便于尝试用不同的方式传递类似的信息
++ 借助人脑的模式识别功能发现需要关注的特征
++ 促进理解数据操作和结果之间的关系
++ 从单维到多维的数据理解
+
+## 简单的 Histogram I
+```{r h1, exercise=TRUE}
+hist(mtcars$mpg, main = "")
+```
+
+## 简单的 Histogram II
+```{r h2, exercise=TRUE}
+h <- hist(mtcars$mpg, col = "red", freq = F,
+xlab = "Miles per Gallon", main = "")
+lines(density(mtcars$mpg), col="blue", lwd=2)
+```
+
+## 同时呈现多个图 I
+```{r ph1, exercise=TRUE}
+par(mfcol = c(1,2))
+hist(mtcars$mpg, col = "red", freq = F,
+xlab = "Miles per Gallon", main = "")
+lines(density(mtcars$mpg), col="blue", lwd=2)
+hist(mtcars$mpg, main = "")
+```
+
+## 同时呈现多个图 II
+```{r ph2, exercise=TRUE}
+par(mfrow = c(2,1))
+hist(mtcars$mpg, col = "red", freq = F,
+xlab = "Miles per Gallon", main = "")
+lines(density(mtcars$mpg), col="blue", lwd=2)
+hist(mtcars$mpg, main = "")
+```
+
+## 重新定义了绘图的语法逻辑
+如果我们使用 R 的基本功能进行数据可视化的处理，一般情况下都可以圆满完成任务。但当我们对数据可视化效果的要求比较高的时候，R的基本功能理论上也能够完成相应的操作，但需要相对复杂的编码。ggplot2功能包的出现重新定义了绘图的逻辑操作，提供了一整套能够快速实现相对复杂的数据可视化效果的函数。
+
++ 数据（Data）
++ 美学映射（Aesthetics）
++ 几何对象（Geometric objects）
++ 其他元素（Theme adjustments）
+
+## 逐层丰富和完善的绘图逻辑 I
+ggplot2 的绘图都是从最底层的大白图开始，然后逐层添加和完善
+```{r gg, exercise=TRUE}
+suppressMessages(library(tidyverse))
+ggplot(data = mtcars)
+```
+
+## 逐层丰富和完善的绘图逻辑 II
+```{r gg2, exercise=TRUE}
+suppressMessages(library(tidyverse))
+ggplot(data = mtcars, aes(x = mpg)) +
+  geom_histogram(fill = "red", color = "black", bins = 5) +
+  geom_density(color = "blue")
+```
+
+## 逐层丰富和完善的绘图逻辑 III
+```{r gg3, exercise=TRUE}
+suppressMessages(library(tidyverse))
+ggplot(data = mtcars, aes(x = mpg)) +
+  geom_histogram(aes(y = ..density..), fill = "red", color = "black") +
+  geom_density(color = "blue", lwd = 1)
+```
+
+## 逐层丰富和完善的绘图逻辑 IV
+```{r gg4, exercise=TRUE}
+suppressMessages(library(tidyverse))
+ggplot(data = mtcars, aes(x = mpg)) +
+  geom_histogram(aes(y = ..density..), fill = "red", color = "black") +
+  geom_density(color = "blue", lwd = 1) +
+  ggtitle("Histogram with Imposed Density Curve \n (Miles Per Gallon)")
+```
+
+## 逐层丰富和完善的绘图逻辑 V
+```{r gg5, exercise=TRUE}
+suppressMessages(library(tidyverse))
+ggplot(data = mtcars, aes(x = mpg)) +
+  geom_histogram(aes(y = ..density..), fill = "red", color = "black") +
+  geom_density(color = "blue", lwd = 1) +
+  ggtitle("Histogram with Imposed Density Curve \n (Miles Per Gallon)") +
+  ylab("Density") +
+  xlab("Miles per Gallon")
+```
+
+## 逐层丰富和完善的绘图逻辑 VI
+```{r gg6, exercise=TRUE}
+suppressMessages(library(tidyverse))
+ggplot(data = mtcars, aes(x = mpg)) +
+  geom_histogram(aes(y = ..density..), fill = "red", color = "black") +
+  geom_density(color = "blue", lwd = 1) +
+  ggtitle("Histogram with Imposed Density Curve \n (Miles Per Gallon)") +
+  ylab("Density") +
+  xlab("Miles per Gallon") +
+  theme(plot.title = element_text(hjust = 0.5))
+```
+
+## 预设好参数的绘图包 I
+```{r pp1, exercise=TRUE}
+suppressMessages(library(tidyverse))
+suppressMessages(library(cowplot))
+fig1 <- ggplot(data = mtcars, aes(x = mpg)) +
+  geom_histogram(aes(y = ..density..), fill = "red", color = "black") +
+  geom_density(color = "blue", lwd = 1) +
+  ggtitle("Histogram with Density Curve \n (Miles Per Gallon)") +
+  ylab("Density") +
+  xlab("Miles per Gallon")
+fig1
+```
+
+## 预设好参数的绘图包 II
+```{r pp2, exercise=TRUE}
+suppressMessages(library(tidyverse))
+suppressMessages(library(cowplot))
+fig1 <- ggplot(data = mtcars, aes(x = mpg)) +
+  geom_histogram(aes(y = ..density..), fill = "red", color = "black") +
+  geom_density(color = "blue", lwd = 1) +
+  ggtitle("Histogram with Density Curve \n (Miles Per Gallon)") +
+  ylab("Density") +
+  xlab("Miles per Gallon")
+mtcars$am <- factor(mtcars$am, labels = c("Mannual", "Automatic"))
+fig2 <- ggplot(data = mtcars, aes(y = mpg, x = am)) +
+  geom_boxplot() +
+  ggtitle("Botplots of Miles per Gallon \n By Transmission Types") +
+  xlab("Transmission Types") +
+  ylab("Miles per Gallon")
+plot_grid(fig1, fig2, nrow = 1)
+```
+
+## 预设好参数的绘图包 III
+```{r pp3, exercise=TRUE}
+suppressMessages(library(tidyverse))
+suppressMessages(library(cowplot))
+fig1 <- ggplot(data = mtcars, aes(x = mpg)) +
+  geom_histogram(aes(y = ..density..), fill = "red", color = "black") +
+  geom_density(color = "blue", lwd = 1) +
+  ggtitle("Histogram with Density Curve \n (Miles Per Gallon)") +
+  ylab("Density") +
+  xlab("Miles per Gallon")
+mtcars$am <- factor(mtcars$am, labels = c("Mannual", "Automatic"))
+fig2 <- ggplot(data = mtcars, aes(y = mpg, x = am)) +
+  geom_boxplot() +
+  ggtitle("Botplots of Miles per Gallon \n By Transmission Types") +
+  xlab("Transmission Types") +
+  ylab("Miles per Gallon")
+plot_grid(fig1, fig2, nrow = 2)
+```
+
+## 分组绘图 I
+```{r facet, exercise=TRUE}
+suppressMessages(library(tidyverse))
+suppressMessages(library(cowplot))
+ggplot(data = mtcars, aes(x = mpg)) +
+  geom_histogram(aes(y = ..density..), fill = "Green", color = "black", bins = 5) +
+  facet_grid(am ~ .) +
+  ggtitle("Histogram of Milles per Gallon \n By Tranmission Types")
+```
+
+## 分组绘图 II
+```{r facet2, exercise=TRUE}
+suppressMessages(library(tidyverse))
+suppressMessages(library(cowplot))
+ggplot(data = mtcars, aes(x = mpg)) +
+  geom_histogram(aes(y = ..density..), fill = "Green", color = "black", bins = 5) +
+  facet_grid(. ~ am) +
+  ggtitle("Histogram of Milles per Gallon \n By Tranmission Types")
+```

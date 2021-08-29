@@ -1,0 +1,262 @@
+---
+title: "class11"
+output: learnr::tutorial
+runtime: shiny_prerendered
+---
+
+```{r setup, include=FALSE}
+library(learnr)
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+
+## 
+<h1> 政治学数据分析与编程 </h1>
+<h2> 第十一讲 </h2>
+
+吕杰
+
+中国人民大学国际关系学院政治学系
+
+<script language=JavaScript>
+today=new Date();
+function initArray(){
+this.length=initArray.arguments.length
+for(var i=0;i<this.length;i++)
+this[i+1]=initArray.arguments[i] }
+var d=new initArray(
+"星期日",
+"星期一",
+"星期二",
+"星期三",
+"星期四",
+"星期五",
+"星期六");
+document.write(
+"<font color=#333 style='font-size:9pt;font-family: 楷体'> ",
+today.getFullYear(),"年",
+today.getMonth()+1,"月",
+today.getDate(),"日",
+d[today.getDay()+1],
+"</font>" );
+</script>
+
+## 内容提纲
+
++ 统计模型结果的可视化
++ 回归模型的常规可视化处理
+
+## R 对统计结果信息的处理 I
+原始信息的存储
+
++ List
++ 不同类型的数据
++ 不同长度的数据
+
+```{r sto, exercise=TRUE}
+suppressMessages(library(tidyverse))
+tdata <- iris %>%
+  filter(Species != "setosa")
+t.result <- t.test(Petal.Length ~ Species, data = tdata)
+ols.result <- lm(Petal.Length ~ Species, data = iris)
+```
+
+## R 对统计结果信息的处理 II
+```{r tj, exercise=TRUE}
+suppressMessages(library(tidyverse))
+tdata <- iris %>%
+  filter(Species != "setosa")
+t.result <- t.test(Petal.Length ~ Species, data = tdata)
+t.result
+```
+
+## R 对统计结果信息的处理 III
+```{r tj2, exercise=TRUE}
+suppressMessages(library(tidyverse))
+tdata <- iris %>%
+  filter(Species != "setosa")
+ols.result <- lm(Petal.Length ~ Species, data = iris)
+ols.result
+```
+
+
+## R 对统计结果信息的处理 IV
+```{r tj3, exercise=TRUE}
+suppressMessages(library(tidyverse))
+tdata <- iris %>%
+  filter(Species != "setosa")
+ols.result <- lm(Petal.Length ~ Species, data = iris)
+summary(ols.result)
+```
+
+## 需要哪些信息？
+呈现统计检测的全貌
+
++ 关键统计指标
++ 指标对应的统计检验信息
++ 关键模型参数
++ 参数对应的不确定性
+
+## 对 List 的常规操作 I
+```{r list, exercise=TRUE}
+suppressMessages(library(tidyverse))
+tdata <- iris %>%
+  filter(Species != "setosa")
+t.result <- t.test(Petal.Length ~ Species, data = tdata)
+ols.result <- lm(Petal.Length ~ Species, data = iris)
+names(t.result)
+names(ols.result)
+```
+
+## 对 List 的常规操作 II
+```{r l2, exercise=TRUE}
+suppressMessages(library(tidyverse))
+tdata <- iris %>%
+  filter(Species != "setosa")
+t.result <- t.test(Petal.Length ~ Species, data = tdata)
+ols.result <- lm(Petal.Length ~ Species, data = iris)
+t.result[[1]]
+t.result$statistic
+ols.result[[1]]
+ols.result$coefficients
+```
+
+## 模型参数 I
+模型参数的相关信息
+
++ 参数的估值
++ 参数估值的不确定性
++ 参数对应的统计检验
++ 参数检验对应的零假设
++ 参数检验对应的 I 型错误率
+
+## 模型参数 II
+在研究报告的相关陈述中直接引用模型的参数
+
++ 对鸢尾植物花瓣长度的 t 检验植为-12.604
++ 对应上述 t 检验的 p 值为 0
+
+```{r mp, exercise=TRUE}
+suppressMessages(library(tidyverse))
+tdata <- iris %>%
+  filter(Species != "setosa")
+t.result <- t.test(Petal.Length ~ Species, data = tdata)
+
+round(t.result$statistic, digits = 3)
+
+```
+
+不同的文件引用List结果的语法不同，在Beamer等$\LaTeX$环境下可以用如下方式：
+对鸢尾植物花瓣长度的t检验植为`\Sexpr{}`
+
+## 模型参数 III
+```{r mp2, exercise=TRUE}
+suppressMessages(library(tidyverse))
+tdata <- iris %>%
+  filter(Species != "setosa")
+ols.result <- lm(Petal.Length ~ Species, data = iris)
+
+ols.sum <- summary(ols.result)
+names(ols.sum)
+
+ols.sum
+```
+
+## 模型参数 IV
+```{r mp3, exercise=TRUE}
+suppressMessages(library(tidyverse))
+tdata <- iris %>%
+  filter(Species != "setosa")
+ols.result <- lm(Petal.Length ~ Species, data = iris)
+ols.sum <- summary(ols.result)
+
+par.est <- ols.sum$coefficient[, 1]
+par.str <- ols.sum$coefficient[, 2]
+par.est90ub <- par.est + 1.645*par.str
+par.est90lb <- par.est - 1.645*par.str
+par.est95ub <- par.est + 1.960*par.str
+par.est95lb <- par.est - 1.960*par.str
+par.est99ub <- par.est + 2.576*par.str
+par.est99lb <- par.est - 2.576*par.str
+```
+
+## 模型参数 V
+依照 OLS 模型估计，Setosa鸢尾植物花萼长度的平均值为1.462厘米，对应的90%置信区间为[1.362,1.562]；对应的95%置信区间为[1.343,1.581]；对应的99%置信区间为[1.305,1.619]。
+
+Versicolor 鸢尾植物比Setosa花萼平均长2.798 厘米，对应的90%置信区间为[2.656, 2.94]；对应的95%置信区间为[2.629, 2.967]；对应的99%置信区间为[2.576, 3.02]。
+
+Virginica鸢尾植物比Setosa花萼平均长4.09厘米，对应的90%置信区间为[3.948,4.232]；对应的95%置信区间为[3.921,4.259]；对应的99%置信区间为[3.868,4.312]。
+
+
+## 模型参数 VI
+```{r mp4, exercise=TRUE}
+outcome90 <- as.data.frame(cbind(c(0.95, 1.95, 2.95), par.est,par.est90lb, par.est90ub, c(rep(90, 3))))
+outcome95 <- as.data.frame(cbind(c(1, 2, 3), par.est, par.est95lb, par.est95ub, c(rep(95, 3))))
+outcome99 <- as.data.frame(cbind(c(1.05, 2.05, 3.05), par.est, par.est99lb, par.est99ub, c(rep(99, 3))))
+colnames(outcome90) <- c("yp", "par", "parlb", "parub", "ci")
+colnames(outcome95) <- c("yp", "par", "parlb", "parub", "ci")
+colnames(outcome99) <- c("yp", "par", "parlb", "parub", "ci")
+outcome <- rbind(outcome90, outcome95, outcome99)
+outcome$ci <- factor(outcome$ci, labels = c("90CI", "95CI", "99CI"))
+```
+
+## 模型参数 VII
+```{r mp5, exercise=TRUE}
+suppressMessages(library(tidyverse))
+tdata <- iris %>%
+  filter(Species != "setosa")
+ols.result <- lm(Petal.Length ~ Species, data = iris)
+ols.sum <- summary(ols.result)
+
+par.est <- ols.sum$coefficient[, 1]
+par.str <- ols.sum$coefficient[, 2]
+par.est90ub <- par.est + 1.645*par.str
+par.est90lb <- par.est - 1.645*par.str
+par.est95ub <- par.est + 1.960*par.str
+par.est95lb <- par.est - 1.960*par.str
+par.est99ub <- par.est + 2.576*par.str
+par.est99lb <- par.est - 2.576*par.str
+
+outcome90 <- as.data.frame(cbind(c(0.95, 1.95, 2.95), par.est,par.est90lb, par.est90ub, c(rep(90, 3))))
+outcome95 <- as.data.frame(cbind(c(1, 2, 3), par.est, par.est95lb, par.est95ub, c(rep(95, 3))))
+outcome99 <- as.data.frame(cbind(c(1.05, 2.05, 3.05), par.est, par.est99lb, par.est99ub, c(rep(99, 3))))
+colnames(outcome90) <- c("yp", "par", "parlb", "parub", "ci")
+colnames(outcome95) <- c("yp", "par", "parlb", "parub", "ci")
+colnames(outcome99) <- c("yp", "par", "parlb", "parub", "ci")
+outcome <- rbind(outcome90, outcome95, outcome99)
+outcome$ci <- factor(outcome$ci, labels = c("90CI", "95CI", "99CI"))
+
+ggplot(data = outcome) +
+  geom_pointrange(aes(x = yp, y = par,
+                      ymin = parlb, ymax = parub,
+                      shape = ci, alpha = 0.5)) +
+  scale_y_continuous(limits = c(0, 5), breaks = seq(0, 5, by = 0.5)) +
+  scale_x_continuous(breaks = c(1, 2, 3),
+                     labels = c("Setosa", "Versicolor-Setosa","Virginica-Setosa")) +
+  scale_color_discrete(name = "Confidence Intervals",
+                       labels = c("90%", "95%", "99%")) +
+  ylab("Petal Length (cm)") +
+  xlab("Coefficients") +
+  ggtitle("OLS Regression Conefficients \n (with confidence intervals)") +
+  theme(legend.position = "none") +
+  coord_flip()
+```
+
+## 模型参数 VIII
+
+可以利用现成的软件包绘图
+```{r mp6, exercise=TRUE}
+library(arm)
+```
+
+
+## 模型参数 IX
+
+```{r mp7, exercise=TRUE}
+suppressMessages(library(tidyverse))
+suppressMessages(library(arm))
+tdata <- iris %>%
+  filter(Species != "setosa")
+ols.result <- lm(Petal.Length ~ Species, data = iris)
+coefplot(ols.result, intercept = T)
+```

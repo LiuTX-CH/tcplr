@@ -1,0 +1,195 @@
+---
+title: "class4"
+output: learnr::tutorial
+runtime: shiny_prerendered
+---
+
+```{r setup, include=FALSE}
+library(learnr)
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+
+## 
+<h1> 政治学数据分析与编程 </h1>
+<h2> 第四讲 </h2>
+
+吕杰
+
+中国人民大学国际关系学院政治学系
+
+<script language=JavaScript>
+today=new Date();
+function initArray(){
+this.length=initArray.arguments.length
+for(var i=0;i<this.length;i++)
+this[i+1]=initArray.arguments[i] }
+var d=new initArray(
+"星期日",
+"星期一",
+"星期二",
+"星期三",
+"星期四",
+"星期五",
+"星期六");
+document.write(
+"<font color=#333 style='font-size:9pt;font-family: 楷体'> ",
+today.getFullYear(),"年",
+today.getMonth()+1,"月",
+today.getDate(),"日",
+d[today.getDay()+1],
+"</font>" );
+</script>
+
+## 内容提纲
++ 不同的数据存储类型
++ 数据框及其操作
++ 导入其他软件生成的数据
+
+## 常用的存储类型
++ 数值（numeric）
+  * 整数（integer）
+  * 浮点数（double/float/real）
++ 字符（character）
++ 逻辑值（logical）
++ 复数（complex）
+
+## 整数（integer） I
+整数存储范围的绝对值从0到$2 × 10^9$，存储空间是4个字节，一般用于数值计算。
+```{r inte, exercise=TRUE}
+x <- 3
+is.integer(x)
+```
+```{r intea, exercise=TRUE}
+y <- as.integer(3)
+is.integer(y)
+```
+```{r inteb, exercise=TRUE}
+z <- 3L
+is.integer(z)
+```
+
+## 整数（integer） II
+```{r inte2, exercise=TRUE}
+as.integer(3.49)
+```
+```{r inte3, exercise=TRUE}
+as.integer(3.51)
+```
+```{r inte4, exercise=TRUE}
+round(3.49)
+```
+```{r inte5, exercise=TRUE}
+round(3.51)
+```
+
+## 整数（integer） III
+```{r inte6, exercise=TRUE}
+s1 <- as.integer("5.24")
+s1
+```
+```{r inte7, exercise=TRUE}
+s2 <- as.integer("Data Science")
+s2
+```
+```{r inte8, exercise=TRUE}
+as.integer(TRUE)
+```
+
+## 浮点数（double）
+浮点数存储范围的绝对值从$2 × 10^{−308}$ 到$2 × 10^{308}$，存储空间是8个字节，一般用于数值计算。
+
+```{r dbl, exercise=TRUE}
+s3 <- as.double("5.24")
+s3
+```
+
+## 字符（character） I
+所有文本信息的存储方式，在 R 的显示下有双引号.
+```{r chr, exercise=TRUE}
+as.character(1.99)
+```
+```{r chr2, exercise=TRUE}
+s4 <- "Hello"
+s5 <- "World!"
+s6 <- paste(s4, s5)
+s7 <- paste(s4, s5, sep = "")
+s6
+s7
+```
+
+## 字符（character） II
+文本变量的操作一般涉及合并、替代、抽取。
+```{r chr3, exercise=TRUE}
+sprintf("%s cost about %d dollars!", "The sneakers", 150)
+```
+```{r chr4, exercise=TRUE}
+substr("This is a good start.", start = 3, stop = 14)
+```
+```{r chr5, exercise=TRUE}
+sub("negative", "positive", "we promote negative energy")
+```
+
+## 逻辑（logical）
+逻辑变量一般用来进行条件设定，仅有两个值`True`和`False`。
+```{r lol, exercise=TRUE}
+x <- 5
+y <- 3
+z <- x > y
+t <- x == y
+z & t
+z | t
+!z
+```
+
+## 因子（factor）
+因子是 R 变量体系中较特殊的类型，一般存储为整数，但对应的是类别变量。在分类、数据分析、模型设定中有广泛应用。
+```{r fac, exercise=TRUE}
+gender <- rep(c(0, 1), each = 5)
+gender.f <- factor(gender)
+gender.fl <- factor(gender, labels = c("F", "M"))
+summary(gender)
+summary(gender.fl)
+```
+
+## 数据框的建立 I
+在 R 中手动输入。
+```{r dtf, exercise=TRUE}
+name <- c("A", "B", "C", "D", "E", "F")
+sex <- c(0, 1, 1, 1, 0, 0)
+exam <- c(65, 78, 56, 88, 94, 80)
+grade1 <- as.data.frame(cbind(sex, exam))
+grade1$name <- name
+grade1
+```
+
+## 数据框的建立 II
+通过 R 读取命令导入”.txt” 数据文件。
+```{r dtf2, exercise=TRUE}
+#注意调整文件路径
+setwd("D:/Courses and Lectures/Teaching in China")
+grade2 <- read.table("Data1.txt", header = T)
+grade2
+```
+
+## 数据框的建立 III
+通过 R 读取命令导入”.csv” 数据文件。
+```{r dtf3, exercise=TRUE}
+grade3 <- read.csv("Data2.csv", header = T)
+grade3
+```
+
+## 读取Stata 数据文件
+通过 foreign package 来读取其他软件格式的数据，最常用的比如 Stata，支持 5-12 版的数据格式，导入”.dta” 文件。
+```{r frn3, exercise=TRUE}
+library(foreign)
+grade4 <- read.dta("Data3.dta")
+head(grade4, n = 6)
+```
+
+## 读取 SPSS 数据文件
+SPSS 数据格式，2000 年前的版本完全兼容，随后版本的数据格式可能有部分不支持，导入”.sav” 文件。
+```{r spss, exercise=TRUE}
+grade5 <- read.spss("Data4.sav", to.data.frame = T)
+head(grade5, n = 6)
+```

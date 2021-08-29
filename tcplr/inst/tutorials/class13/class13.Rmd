@@ -1,0 +1,268 @@
+---
+title: "Data Visualization with R"
+output: learnr::tutorial
+runtime: shiny_prerendered
+---
+
+```{r setup, include=FALSE}
+library(learnr)
+library(ggplot2)
+knitr::opts_chunk$set(echo = FALSE)
+```
+## 
+<h1> 数据可视化引论 </h1>
+<h2> 课外辅导 </h2>
+
+刘天祥
+
+中国人民大学国际关系学院政治学系
+
+<script language=JavaScript>
+today=new Date();
+function initArray(){
+this.length=initArray.arguments.length
+for(var i=0;i<this.length;i++)
+this[i+1]=initArray.arguments[i] }
+var d=new initArray(
+"星期日",
+"星期一",
+"星期二",
+"星期三",
+"星期四",
+"星期五",
+"星期六");
+document.write(
+"<font color=#333 style='font-size:9pt;font-family: 楷体'> ",
+today.getFullYear(),"年",
+today.getMonth()+1,"月",
+today.getDate(),"日",
+d[today.getDay()+1],
+"</font>" );
+</script>
+
+## Introduction to Data Visualization
+
+### Three Functions of Data Visualization
+
+*The greatest value of a picture is when it forces us to notice what we never expected to see --- John Tukey*
+
++ Explore
++ Describe
++ Infer
+
+### R for Data Visualization
++ Freely Control
++ Replicable
++ relatively forming packages: ggplot2
+
+## Basic Elements of Graphics(1)
+### **Coordinate Axis**
++ Coordinate System
++ Data Type
++ Scale
+
+### **Data Visualization**
+```{r, echo=FALSE}
+fluidRow(style = "padding-bottom: 20px;",
+column(5,selectInput("Types_x", label = "Data Type for x axis",
+              choices = c("Numeric","Categorical"), selected = "Numeric")),
+  
+column(5,selectInput("Types_y", label = "Data Type for y axis",
+              choices = c("Numeric","Categorical"), selected = "Numeric")))
+  
+sliderInput("Scale_x", label = "Scale of x axis",
+              min = 5.7, max = 10, value = 5.7, step = 0.1)
+  
+sliderInput("Scale_y", label = "Scale of y axis",
+              min = 4.5, max = 10, value = 4.5, step = 0.1)
+plotOutput("Plot1")
+```
+
+```{r, context="server"}
+output$Plot1 = renderPlot({
+  if(input$Types_y == "Numeric"){
+    if(input$Types_x == "Numeric"){
+      ggplot(iris[iris$Species == "setosa",]) +
+        geom_smooth(aes(x = Sepal.Length, y = Sepal.Width),
+                    method = "lm", se = F) +
+        scale_x_continuous(limits = c(4.3, input$Scale_x)) +
+        scale_y_continuous(limits = c(2.5, input$Scale_y)) +
+        theme_bw()
+    } else {
+      ggplot(iris) +
+        geom_violin(aes(x = Species, y = Sepal.Length)) +
+        theme_bw()
+      }
+  } else {
+    if(input$Types_x == "Numeric"){
+      ggplot(iris) +
+        geom_boxplot(aes(y = Species, x = Sepal.Length)) +
+        theme_bw()
+    } else {
+      ggplot(diamonds,aes(x = cut, y = color)) +
+        geom_count(shape = "diamond") +
+        theme_bw()
+    }
+  }
+})
+```
+
+## Basic Elements of Graphics(2)
+### **Point**
++ Distribution
+  * Density
+  * relative distance
++ Characteristics
+  * color
+  * shape
+  * transparency
+  * size
+
+### **Data Visualization**
+```{r, echo=FALSE}
+selectInput("Plots", label = "Plot",
+              choices = c("iris","diamonds"), selected = "iris")
+
+fluidRow(style = "padding-bottom: 20px;",
+column(4,sliderInput("Red", label = "Color_red",
+              min = -1, max = 255, value = 255, step = 1)),
+  
+column(4,sliderInput("Green", label = "Color_green",
+              min = 0, max = 255, value = 0, step = 1)),
+
+column(4,sliderInput("Blue", label = "Color_blue",
+              min = 0, max = 255, value = 0, step = 1)))
+  
+sliderInput("Shapes", label = "Shape of points",
+              min = 0, max = 25, value = 16, step = 1)
+  
+sliderInput("Transparency", label = "Transparency of points",
+              min = 0, max = 1, value = 1, step = 0.1)
+plotOutput("Plot2")
+```
+
+```{r, context="server"}
+output$Plot2 = renderPlot({
+  if(input$Plots == "iris"){
+    if(input$Shapes == 0){
+      if(input$Red == -1){
+        ggplot(iris,aes(x = Sepal.Length, y = Sepal.Width)) +
+          geom_point(aes(shape = Species, color = Species)) +
+          theme_bw()
+      } else {
+        ggplot(iris,aes(x = Sepal.Length, y = Sepal.Width)) +
+          geom_point(aes(shape = Species),
+                     color = rgb(input$Red/255,input$Green/255,input$Blue/255)) +
+          theme_bw()
+      }
+    } else {
+      if(input$Red == -1){
+        ggplot(iris,aes(x = Sepal.Length, y = Sepal.Width)) +
+          geom_point(aes(color = Species), shape = input$Shapes) +
+          theme_bw()
+      } else {
+        ggplot(iris,aes(x = Sepal.Length, y = Sepal.Width)) +
+          geom_point(color = rgb(input$Red/255, input$Green/255, input$Blue/255), shape = input$Shapes) +
+          theme_bw()
+        }
+    }
+  } else {
+    ggplot(diamonds) +
+      geom_point(aes(x = carat, y = price),
+                 alpha = input$Transparency) +
+      theme_bw()
+  }
+})
+```
+
+## Basic Elements of Graphics(3)
+### **line**
++ Characteristics
+  * type
+  * width
+  * color
+  
+### **Data Visualization**
+```{r, echo=FALSE}
+fluidRow(style = "padding-bottom: 20px;",
+column(4,sliderInput("Red2", label = "Color_red",
+              min = -1, max = 255, value = 255, step = 1)),
+  
+column(4,sliderInput("Green2", label = "Color_green",
+              min = 0, max = 255, value = 0, step = 1)),
+
+column(4,sliderInput("Blue2", label = "Color_blue",
+              min = 0, max = 255, value = 0, step = 1)))
+  
+sliderInput("Types", label = "Type of line",
+              min = -1, max = 8, value = 1, step = 1)
+plotOutput("Plot3")
+```
+
+```{r, context="server"}
+output$Plot3 = renderPlot({
+    if(input$Red2 == -1){
+      if(input$Types == -1){
+        ggplot(iris, aes(x = Sepal.Length, y = Sepal.Width)) +
+          geom_smooth(aes(color = Species, linetype = Species),
+                      method = "lm", se = F) +
+          theme_bw()
+      } else{
+        ggplot(iris, aes(x = Sepal.Length, y = Sepal.Width)) +
+          geom_smooth(aes(color = Species), linetype = input$Types,
+                      method = "lm", se = F) +
+          theme_bw()
+      }
+    } else {
+      if(input$Types == -1){
+        ggplot(iris, aes(x = Sepal.Length, y = Sepal.Width)) +
+          geom_smooth(aes(linetype = Species), color = rgb(input$Red2/255, input$Green2/255, input$Blue2/255),
+                      method = "lm", se = F) +
+          theme_bw()
+      } else{
+        ggplot(iris, aes(x = Sepal.Length, y = Sepal.Width)) +
+          geom_smooth(color = rgb(input$Red2/255, input$Green2/255,   input$Blue2/255), linetype = input$Types,
+                      method = "lm", se = F) +
+          theme_bw()
+      }
+    }
+})
+```
+
+## Introduction to ggplot2 pacakge
++ Logic of layer superposition
++ Several types of 2D graphics
+  * single-variable: `geom_boxplot`,`geom_violin`,`geom_bar`,`geom_histogram`,`geom_density`
+  * two variables: `geom_point`,`geom_smooth`,`geom_count`,`geom_density_2d`
+  * higher dimention: color,shape,linetype,`facet_wrap`
+
+```{r ggplot2, exercise=TRUE}
+library(ggplot2)
+ggplot(iris,aes(x = Sepal.Length, y = Sepal.Width)) +
+  geom_point(aes(color = Species)) +
+  geom_smooth(method = "lm", color = "red")
+```
+
+## Graphics Decorating
++ Theme
++ Title
++ Axis
++ Legend
++ Facet
++ Coordinate Transfer
+
+```{r decorate, exercise=TRUE}
+library(ggplot2)
+ggplot(iris,aes(x = Sepal.Length, y = Sepal.Width)) +
+  geom_point(aes(color = Species)) +
+  geom_smooth(method = "lm", color = "red") +
+  theme_bw() +
+  ggtitle("Figures 1") +
+  scale_x_continuous(breaks = seq(4,8,0.5),
+                     limits = c(4,8)) +
+  scale_y_continuous(breaks = seq(2.5,4,0.1),
+                     limits = c(2.5,4)) +
+  theme(legend.position = "bottom") +
+  facet_wrap( ~ Species) +
+  coord_flip()
+```

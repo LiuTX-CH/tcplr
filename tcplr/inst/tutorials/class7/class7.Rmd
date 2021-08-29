@@ -1,0 +1,276 @@
+---
+title: "class7"
+output: learnr::tutorial
+runtime: shiny_prerendered
+---
+
+```{r setup, include=FALSE}
+library(learnr)
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+## 
+<h1> 政治学数据分析与编程 </h1>
+<h2> 第七讲 </h2>
+
+吕杰
+
+中国人民大学国际关系学院政治学系
+
+<script language=JavaScript>
+today=new Date();
+function initArray(){
+this.length=initArray.arguments.length
+for(var i=0;i<this.length;i++)
+this[i+1]=initArray.arguments[i] }
+var d=new initArray(
+"星期日",
+"星期一",
+"星期二",
+"星期三",
+"星期四",
+"星期五",
+"星期六");
+document.write(
+"<font color=#333 style='font-size:9pt;font-family: 楷体'> ",
+today.getFullYear(),"年",
+today.getMonth()+1,"月",
+today.getDate(),"日",
+d[today.getDay()+1],
+"</font>" );
+</script>
+
+## 内容提纲
++ 单变量探索性分析
++ 双变量探索性分析
++ 多变量探索性分析
++ 缺失值的探索性分析
+
+## 单变量分析的目的
+
+呈现变量的分布特征（distributional features）
+
++ 集中趋势（central tendency）
+  * 众数（mode）
+  * 中位数（median）
+  * 均值（mean）
++ 离散度（dispersion）
+  * 最大最小值区间（min-max range）
+  * 分位数区间（inter-quantile range）
+  * 方差（variance）
++ 组成结构（元素比例）
+
+## Histogram
+```{r hist, exercise=TRUE}
+suppressMessages(library(tidyverse))
+fig1 <- ggplot(data = mtcars, aes(x = mpg)) +
+  geom_histogram(aes(y = ..density..), bins = 30, fill = "blue") +
+  geom_density(color = "black") +
+  xlab("Miles per Gallon") +
+  ylab("") +
+  ggtitle("Histogram of Miles per Gallon")
+fig1
+```
+
+## Boxplot 
+```{r box, exercise=TRUE}
+suppressMessages(library(tidyverse))
+mtcars$type <- "Automobiles"
+fig2 <- ggplot(data = mtcars, aes(y = mpg, x = type)) +
+  geom_boxplot(fill = "blue", color = "black") +
+  xlab("") +
+  ylab("Miles per Gallon") +
+  ggtitle("Boxplot of Miles per Gallon")
+fig2
+```
+
+## Violinplot
+```{r vio, exercise=TRUE}
+suppressMessages(library(tidyverse))
+mtcars$type <- "Automobiles"
+fig3 <- ggplot(data = mtcars, aes(y = mpg, x = type)) +
+  geom_violin(fill = "blue", color = "black", draw_quantiles = c(0.25, 0.5, 0.75), trim = F) +
+  xlab("") +
+  ylab("Miles per Gallon") +
+  ggtitle("Violinplot of Miles per Gallon")
+fig3
+```
+
+## Bar Chart
+```{r bar, exercise=TRUE}
+suppressMessages(library(tidyverse))
+fig4 <- ggplot(data = diamonds) +
+  geom_bar(aes(x = cut, y = ..prop.., group =1), fill = "gold") +
+  xlab("Different Styles of Cut") +
+  ylab("Percentage") +
+  ggtitle("Barplot of Diamond Cuts")
+fig4
+```
+
+## Pie Chart
+```{r pie, exercise=TRUE}
+suppressMessages(library(tidyverse))
+pie.data <- diamonds%>%
+  group_by(cut)%>%
+  summarise(perct = n()/nrow(diamonds))
+fig5 <- ggplot(data = pie.data, aes(x = "")) +
+  geom_bar(aes(y = perct, fill = cut), stat = "identity") +
+  coord_polar("y", start = 0) +
+  xlab("") +
+  ylab("") +
+  ggtitle("Pie Chart of Diamond Cuts") +
+  theme(axis.ticks = element_blank(), axis.text = element_blank(), axis.line = element_blank())
+fig5
+```
+
+## 双变量分析的目的
+呈现变量之间的关系特征（relational features）
+
++ 不同组别分布特征的差异（实验数据的逻辑）
+  * 组别集中趋势的差异
+  * 组别离散度的差异
++ 协同变化的趋势（观测数据的逻辑）
+  * 相关关系的呈现
+  * 定序或者定距变量
+
+## 组别集中趋势
+```{r zbjz1, exercise=TRUE}
+suppressMessages(library(tidyverse))
+cars.new <- mtcars %>%
+              group_by(am) %>%
+              summarise(wt.avg = mean(wt))
+cars.new$am <- factor(cars.new$am, labels = c("Manual", "Auto"))
+fig6 <- ggplot(data = cars.new) +
+  geom_bar(aes(x = am, y = wt.avg), stat = "identity") +
+  xlab("Transmission System") +
+  ylab("Average Weight (tons)") +
+  ggtitle("Automobile Average Weight by Transimission")
+fig6
+```
+
+## 组别离散度
+```{r zbls, exercise=TRUE}
+suppressMessages(library(tidyverse))
+fig7 <- ggplot(data = diamonds) +
+  geom_violin(aes(x = color, y = price, fill = color), trim = F) +
+  xlab("Color of Diamonds") +
+  ylab("Price (USD)") +
+  ggtitle("Diamond Price by Color")
+fig7
+```
+
+## 组别均值和离散度
+```{r zbjz, exercise=TRUE}
+suppressMessages(library(tidyverse))
+fig8 <- ggplot(data = diamonds) +
+  geom_boxplot(aes(x = color, y = price, fill = color)) +
+  xlab("Color of Diamonds") +
+  ylab("Price (USD)") +
+  ggtitle("Diamond Price by Color")
+fig8
+```
+
+## 相关关系 I
+```{r cor1, exercise=TRUE}
+suppressMessages(library(tidyverse))
+fig9 <- ggplot(data = diamonds, aes(x = carat, y = price)) +
+  geom_point() +
+  geom_smooth(method = "auto", color = "red", se = T) +
+  xlab("Diamond Weight (carat)") +
+  ylab("Price (USD)") +
+  ggtitle("Diamond Price by Weight")
+fig9
+```
+
+## 相关关系 II
+```{r cor2, exercise=TRUE}
+suppressMessages(library(tidyverse))
+fig10 <- ggplot(data = diamonds, aes(x = carat, y = price)) +
+  geom_boxplot(aes(group = cut_width(carat, 0.1))) +
+  xlab("Diamond Weight Group (carat)") +
+  ylab("Price (USD)") +
+  ggtitle("Diamond Price by Weight Group")
+fig10
+```
+
+## 相关关系 III
+```{r cor3, exercise=TRUE}
+suppressMessages(library(tidyverse))
+fig11 <- ggplot(data = diamonds, aes(x = cut, y = color)) +
+  geom_count(shape = "diamond") +
+  xlab("Diamond Cut") +
+  ylab("Diamond Color") +
+  ggtitle("Diamond Color by Cut")
+fig11
+```
+
+## 多变量分析的目的
+实现有控制的比较
+
++ 虚假关系检验（spurious relationship）
+  * 控制了第三方因素之后关系消失
++ 交互关系检验（interaction/moderation）
+  * 关系依第三方因素值发生变化
+  
+## 虚假关系检验 I
+```{r dc1, exercise=TRUE}
+y <- rep(NA, 200)
+y[1:50] <- rnorm(50, 0, 0.5)
+y[51:100] <- rnorm(50, 1, 0.5)
+y[101:150] <- rnorm(50, 2, 0.5)
+y[151:200] <- rnorm(50, 3, 0.5)
+x <- seq(1, 200, by = 1)
+z <- rep(c(1, 2, 3, 4), each = 50)
+demo <- as.data.frame(cbind(x, y, z))
+demo$z <- factor(demo$z, labels = c("G1", "G2", "G3", "G4"))
+```
+
+## 虚假关系检验 II
+```{r dc2, exercise=TRUE}
+suppressMessages(library(tidyverse))
+y <- rep(NA, 200)
+y[1:50] <- rnorm(50, 0, 0.5)
+y[51:100] <- rnorm(50, 1, 0.5)
+y[101:150] <- rnorm(50, 2, 0.5)
+y[151:200] <- rnorm(50, 3, 0.5)
+x <- seq(1, 200, by = 1)
+z <- rep(c(1, 2, 3, 4), each = 50)
+demo <- as.data.frame(cbind(x, y, z))
+demo$z <- factor(demo$z, labels = c("G1", "G2", "G3", "G4"))
+
+fig12 <- ggplot(data = demo, aes(x = x, y = y)) +
+  geom_point() +
+  geom_smooth(method = "lm")
+fig13 <- ggplot(data = demo, aes(x = x, y = y, color = z)) +
+  geom_point() +
+  geom_smooth(method = "lm")
+#fig12
+#fig13
+```
+
+## 交互关系检验
+```{r inter, exercise=TRUE}
+suppressMessages(library(tidyverse))
+fig9 <- ggplot(data = diamonds, aes(x = carat, y = price)) +
+  geom_point() +
+  geom_smooth(method = "auto", color = "red", se = T) +
+  xlab("Diamond Weight (carat)") +
+  ylab("Price (USD)") +
+  ggtitle("Diamond Price by Weight")
+
+fig14 <- ggplot(data = diamonds, aes(x = carat, y = price, col = cut)) +
+  geom_point()+
+  geom_smooth(method = "lm")+
+  xlab("Diamond Weight (carat)")+
+  ylab("Diamond Price (USD)")+
+  ggtitle("Diamond Price by Weight by Cut")
+fig9
+fig14
+```
+
+## 缺失值分析的目的
+了解缺失值的分布状态及可能的影响
+
++ 受影响的变量比例
++ 变量受影响的程度
++ 缺失状态的相关关系
